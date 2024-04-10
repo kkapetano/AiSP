@@ -191,16 +191,13 @@ process_names = ['A', 'B', 'C', 'D', 'E']
 process_times = [363, 120, 200, 232, 75]
 time_slice = 100
 n = len(process_times)
-# Create a circular doubly linked list
 process_list = CDLL()
 for i in range(n):
     process_list.add_last([process_names[i], process_times[i]])
 
-
-# Print the initial list
+#TEST 
 print("Initial list:")
 print(process_list)
-# Perform round robin scheduling
 print("Round robin scheduling:")
 while process_list.size > 0:
     process = process_list.head.data
@@ -213,3 +210,146 @@ while process_list.size > 0:
         process_list.rotate()
 
 print("All processes completed.")
+
+
+#ZADATAK 3
+
+class Queue:
+    def __init__(self):
+        self.cdll = CDLL()  # Initialize the circular doubly linked list
+        return
+    
+
+    def enqueue(self, value):
+        self.cdll.add_last(value)
+        return # nadopunite
+
+    def dequeue(self):
+        if self.cdll.size == 0:
+            return print("Queue is empty")
+        else:
+            value = self.cdll.head.data
+            self.cdll.delete_first()
+            return value
+        
+        
+
+    def peek(self):
+        if self.cdll.size == 0:
+            return None
+        else:
+            return self.cdll.head.data
+
+    def is_empty(self):
+        return self.cdll.head is None
+
+    def size(self):
+        return self.cdll.size
+
+    def __str__(self):
+        
+        return self.cdll.__str__()
+    
+
+#TESTING
+
+queue = Queue()
+
+# Enqueue elements
+queue.enqueue(1)
+queue.enqueue(2)
+queue.enqueue(3)
+print('Queue:')
+print(queue)
+
+# Dequeue elements
+print(queue.dequeue())
+print(queue.dequeue())
+
+# Enqueue another element
+queue.enqueue(4)
+print('Queue:')
+print(queue)
+
+# Dequeue remaining elements
+print(queue.dequeue())
+print(queue.dequeue())
+
+# Try to dequeue from an empty queue
+queue.dequeue()
+
+
+
+#ZADATAK 4
+
+class Animal:
+    def __init__(self,name,animal_type):
+        self.name=name
+        self.animal_type=animal_type
+        self.arrival_order=0
+        return
+    
+    def __str__(self):
+        return self.name + " " + self.animal_type
+    
+    
+
+
+class AnimalShelter:
+    def __init__(self):
+        self.dogs = Queue()
+        self.cats = Queue()
+        self.order = 0
+        return
+    
+    def enqueue(self,name,animal_type):
+        animal = Animal(name,animal_type)
+        animal.arrival_order = self.order
+        self.order+=1
+        if animal_type == "Dog":
+            self.dogs.enqueue(animal)
+        elif animal_type == "Cat":
+            self.cats.enqueue(animal)
+        return
+    
+    def dequeue_any(self):
+        if self.dogs.size()==0:
+            return self.cats.dequeue()
+        if self.cats.size()==0:
+            return self.dogs.dequeue()
+        dog = self.dogs.peek()
+        cat = self.cats.peek()
+        if dog.arrival_order < cat.arrival_order:
+            return self.dogs.dequeue()
+        else:
+            return self.cats.dequeue()
+        
+        
+    def dequeue_dog(self):
+        return self.dogs.dequeue()
+    
+    def dequeue_cat(self):
+        return self.cats.dequeue()
+    
+    def __str__(self):
+        return "Dogs: " + str(self.dogs) + "\nCats: " + str(self.cats)
+    
+
+#TESTING
+
+# Create an animal shelter
+shelter = AnimalShelter()
+
+# Enqueue some animals
+shelter.enqueue("Buddy","Dog")
+shelter.enqueue("Fluffy", "Cat")
+shelter.enqueue("Max", "Dog")
+shelter.enqueue("Whiskers", "Cat")
+shelter.enqueue("Felix", "Cat")
+print(shelter)
+
+# Dequeue some animals
+print("Dequeue any:", shelter.dequeue_any())  # Should dequeue Buddy
+print("Dequeue dog:", shelter.dequeue_dog())  # Should dequeue Max
+print("Dequeue cat:", shelter.dequeue_cat())  # Should dequeue Fluffy
+
